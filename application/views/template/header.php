@@ -512,6 +512,9 @@
                                     <li>
                                         <a href="<?php echo base_url('tracking/trimdies') ?>">Trimdies</a>
                                     </li>
+                                    <li>
+                                        <a href="<?php echo base_url('tracking/mesin') ?>">Mesin</a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>

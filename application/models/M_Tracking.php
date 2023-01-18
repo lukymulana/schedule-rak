@@ -47,4 +47,17 @@ class M_Tracking extends CI_Model {
     function inputDataTrim($data) {
         $this->db->insert('data_trimdies',$data);
     }
+
+    function getDataMesin() {
+        return $this->db->get('data_mesin')->result_array();
+    }
+
+    function getDataMesinById($id_mesin) {
+        return $this->db->get_where('data_mesin', array('id_mesin' => $id_mesin))->result_array();
+    }
+
+    function pasangItem($id_mesin, $data) {
+        $this->db->where('id_mesin', $id_mesin);
+        $this->db->update('data_mesin', $data);
+    }
 }

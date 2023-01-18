@@ -112,6 +112,16 @@ class Tracking extends CI_Controller {
         $this->load->view('template/footer');
     }
 
+    public function scanItemMesin()
+    {
+        $id_mesin = $this->input->post('type');
+
+        $data['id_mesin'] = $id_mesin;
+        $this->load->view('template/header');
+        $this->load->view('tracking/scanItemMesin', $data);
+        $this->load->view('template/footer');
+    }
+
     public function simpan($type = null, $no_rak = null) {
         if ($type == null and $no_rak == null) {
             echo "Data tidak boleh kosong";
@@ -159,6 +169,37 @@ class Tracking extends CI_Controller {
         }
     }
     
+    public function pasangItem($id_mesin = null, $item = null) {
+        if ($id_mesin == null and $item == null) {
+            echo "Data tidak boleh kosong";
+        } else {     
+            $data_mesin = $this->m_tracking->getDataMesinById($id_mesin);
+            $dataItem = str_replace('%20',' ',$item);
+
+            if ($data_mesin[0]['status'] == 1) {
+                echo "  <script type='text/javascript'>
+                            alert('Rak sudah digunakan!');
+                            window.location.href = '" . base_url() . "tracking/mesin;
+                        </script>
+                ";
+            } else {
+                $data = array (
+                    "status" => 1,
+                    "last_updated" => date('Y-m-d H:i:s'),
+                    "item" => $dataItem,
+                );
+    
+                $this->m_tracking->pasangItem($id_mesin, $data);
+    
+                echo "  <script type='text/javascript'>
+                        alert('Item Dipasang');
+                        window.location.href = '" . base_url() . "tracking/mesin';
+                    </script>
+                ";
+            }
+        }
+    }
+    
     public function ambilItem()
     {
         $type_item = $this->input->post('type');
@@ -178,44 +219,51 @@ class Tracking extends CI_Controller {
             ";
     }
 
-    public function mesin()
+    public function ambilItemMesin()
     {
-        
-        $this->load->view('template/header');
-        $this->load->view('tracking/viewMesin');
-        $this->load->view('template/footer');
+        $id_mesin = $this->input->post('type');
+
+        $data = array (
+            "status" => 0,
+            "last_updated" => date('Y-m-d H:i:s'),
+            "item" => NULL
+        );
+
+        $this->m_tracking->pasangItem($id_mesin, $data);
+
+        echo "  <script type='text/javascript'>
+                    alert('Silahkan ambil item');
+                    window.location.href = '" . base_url() . "tracking/mesin';
+                </script>
+            ";
     }
 
-    // public function addRak()
-    // {
-    //     $char = range('F', 'G');
-    //     foreach($char as $c) {
-    //         for ($i=1; $i <= 20; $i++) { 
-    //             $id_rak = $c.$i;
-    //             $data = array (
-    //                 'id_rak' => $id_rak,
-    //                 'jenis_rak' => 'Trimdies',
-    //                 'status' => 0
-    //             );
+    public function mesin($id_mesin = null)
+    {
+        if ($id_mesin==null) {
+            $data['data'] = $this->m_tracking->getDataMesin();
+        
+            $this->load->view('template/header');
+            $this->load->view('tracking/scanMesin', $data);
+            $this->load->view('template/footer');
+        } else {
+            $dataMesin = $this->m_tracking->getDataMesinById($id_mesin);
 
-    //             $this->m_tracking->inputDataRak($data);
-    //         }
-    //     }
-    // }
+            if (empty($dataMesin)) {
+                echo "  <script type='text/javascript'>
+                            alert('Mesin tidak ditemukan!');
+                            window.location.href = '" . base_url() . "tracking/mesin';
+                        </script> 
+                ";
+            } else {
+                $data['data'] = $dataMesin;
 
-    // public function addTrim()
-    // {
-    //     for ($i=1; $i <= 5; $i++) { 
-    //         $data = array (
-    //             'type_trimdies' => 'TD WIRTZ CM-YM '.$i,
-    //             'no_trimdies' => $i,
-    //             'jarak_pisau' => 108,
-    //             'jenis' => 'Trimdies'
-    //         );
-
-    //         $this->m_tracking->inputDataTrim($data);
-    //     }
-    // }
+                $this->load->view('template/header');
+                $this->load->view('tracking/viewMesin',$data);
+                $this->load->view('template/footer');
+            }
+        }
+    }
 }
 
  ?>
